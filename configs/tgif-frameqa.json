@@ -1,0 +1,13 @@
+{
+  "dataset": "tgif-frameqa",
+  "feature_dim": 768,
+  "text_seq_len": 30,
+  "frame_sample_size": 5,
+  "video_feature_res": [
+    7,
+    7
+  ],
+  "video_feature_dim": 1024,
+  "task_type": "oe",
+  "num_classes": 1000
+}
