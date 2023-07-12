@@ -5,10 +5,8 @@
 Install all the dependencies using conda environment by typing:
 ```
 conda env create -f env.yaml
-```
-Activate the environment by typing:
-```
 conda activate lrce
+pip install 'git+https://github.com/katsura-jp/pytorch-cosine-annealing-with-warmup'
 ```
 
 ### Dataset
@@ -155,6 +153,20 @@ The `dataset` arguments can be:
 - `tgif-action` for TGIF-Action
 
 To get our reported performance, download our best training checkpoints <a href="https://sejonguniversity-my.sharepoint.com/:f:/g/personal/22110338_sju_ac_kr/Ej-phn6QYMRFqdATVOEMt5ABj3pxNlaIGq3d63I76dhwcg?e=WtonoL">here</a>.
+
+## Citation
+```
+@article{Immanuel2023,
+    author = {Steve Andreas Immanuel and Cheol Jeong},
+    title = {Lightweight recurrent cross-modal encoder for video question answering},
+    journal = {Knowledge-Based Systems},
+    volume = {},
+    number = {},
+    pages = {},
+    month = {6},
+    year = {2023},
+}
+```
 
 ## Credits
 - https://github.com/xudejing/video-question-answering
