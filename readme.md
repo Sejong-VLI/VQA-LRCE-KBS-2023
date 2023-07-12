@@ -1,5 +1,7 @@
 # Lightweight Recurrent Cross-modal Encoder
 
+![architecture](https://i.imgur.com/pTduBh5.png)
+
 ## Setup and Configurations
 ### Environment
 Install all the dependencies using conda environment by typing:
