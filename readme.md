@@ -157,14 +157,14 @@ To get our reported performance, download our best training checkpoints <a href=
 ## Citation
 ```
 @article{Immanuel2023,
-    author = {Steve Andreas Immanuel and Cheol Jeong},
-    title = {Lightweight recurrent cross-modal encoder for video question answering},
+    author  = {S. A. Immanuel and C. Jeong},
+    title   = {Lightweight recurrent cross-modal encoder for video question answering},
     journal = {Knowledge-Based Systems},
-    volume = {},
-    number = {},
-    pages = {},
-    month = {6},
-    year = {2023},
+    volume  = {},
+    number  = {},
+    pages   = {},
+    month   = {6},
+    year    = {2023},
 }
 ```
 
