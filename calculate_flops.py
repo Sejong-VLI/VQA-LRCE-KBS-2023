@@ -314,9 +314,11 @@ def benchmark(model, video_token_length, text_token_length, feature_dim, batch_s
         model(None)
     total_flops = 0
     for evt in prof.key_averages(group_by_input_shape=False):
-        if evt.key != 'aten::addmm':  # exclude linear layer
+        if evt.key not in ['aten::addmm', '[memory]', 'cudaDeviceSynchronize']:  # exclude linear layer and memory deallocation
             total_flops += evt.flops
-    return total_flops / 1000000  # MFLOPS
+            total_runtime += evt.self_cpu_time_total
+            total_memory += evt.self_cpu_memory_usage
+    return total_flops / 1000000, total_runtime / 1000, total_memory / 1048576  # MFLOPS, ms, MB
 
 
 batch_size = 1
@@ -326,30 +328,45 @@ lrce = LRCE(feature_dim, 1, 1, batch=batch_size)
 vqat = VQAT(feature_dim, 1, 1, batch=batch_size)
 violet = VIOLET(feature_dim, 1, 1, batch=batch_size)
 
-axes = {'token_length': [], 'violet': [], 'lrce': [], 'vqat': []}
-video_token_length = 38
-text_token_length = 7
-for i in tqdm(range(10, 60, 10)):
+lrce_data = {'token_length': [], 'flops': [], 'runtime': [], 'memory': []}
+violet_data = {'token_length': [], 'flops': [], 'runtime': [], 'memory': []}
+vqat_data = {'token_length': [], 'flops': [], 'runtime': [], 'memory': []}
+video_token_length = 31
+text_token_length = 14
+benchmark(lrce, video_token_length, text_token_length, feature_dim, batch_size)
+for _ in tqdm(range(4)):
     video_token_length *= 2
     text_token_length *= 2
 
-    lrce_flops = benchmark(lrce, video_token_length, text_token_length, feature_dim, batch_size)
-    violet_flops = benchmark(violet, video_token_length, text_token_length, feature_dim, batch_size)
-    vqat_flops = benchmark(vqat, video_token_length, text_token_length, feature_dim, batch_size)
+    violet_res = benchmark(violet, video_token_length, text_token_length,
+                           feature_dim, batch_size)
+    vqat_res = benchmark(vqat, video_token_length, text_token_length,
+                         feature_dim, batch_size)
+    lrce_res = benchmark(lrce, video_token_length, text_token_length,
+                         feature_dim, batch_size)
 
-    axes['token_length'].append(video_token_length + text_token_length)
-    axes['violet'].append(violet_flops)
-    axes['lrce'].append(lrce_flops)
-    axes['vqat'].append(vqat_flops)
+    lrce_data['token_length'].append(video_token_length + text_token_length)
+    lrce_data['flops'].append(lrce_res[0])
+    lrce_data['runtime'].append(lrce_res[1])
+    lrce_data['memory'].append(lrce_res[2])
 
-print(axes)
+    violet_data['token_length'].append(video_token_length + text_token_length)
+    violet_data['flops'].append(violet_res[0])
+    violet_data['runtime'].append(violet_res[1])
+    violet_data['memory'].append(violet_res[2])
 
-plt.plot(axes['token_length'], axes['violet'], label='VIOLET')
-plt.plot(axes['token_length'], axes['lrce'], label='LRCE')
-plt.plot(axes['token_length'], axes['vqat'], label='VQAT')
-plt.legend()
-plt.xlabel('Token length')
-plt.ylabel('FLOPS')
-# plt.yscale('log')
+    vqat_data['token_length'].append(video_token_length + text_token_length)
+    vqat_data['flops'].append(vqat_res[0])
+    vqat_data['runtime'].append(vqat_res[1])
+    vqat_data['memory'].append(vqat_res[2])
 
-plt.show()
+lrce_df = pd.DataFrame.from_dict(lrce_data)
+violet_df = pd.DataFrame.from_dict(violet_data)
+vqat_df = pd.DataFrame.from_dict(vqat_data)
+
+print('LRCE')
+print(lrce_df)
+print('VIOLET')
+print(violet_df)
+print('VQAT')
+print(vqat_df)
